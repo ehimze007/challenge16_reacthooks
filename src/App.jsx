@@ -5,6 +5,8 @@ import moviesList from "./movies";
 
 function App() {
   const [movies, setMovies] = useState(moviesList);
+  const [results, setResults] = useState([]);
+  const [showSearch, setShowSearch] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -19,6 +21,27 @@ function App() {
     };
 
     setMovies((prev) => [...prev, movie]);
+  }
+
+  function handleSearch(e) {
+    e.preventDefault();
+    const form = e.target;
+    const searchKeyword = form.search.value;
+
+    if (searchKeyword === "") {
+      setShowSearch(false);
+      return;
+    }
+
+    const filteredMovies = movies.filter((movie) => {
+      return (
+        movie.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        movie.rating == searchKeyword
+      );
+    });
+
+    setResults(() => filteredMovies);
+    setShowSearch(true);
   }
 
   return (
@@ -51,11 +74,12 @@ function App() {
       </aside>
 
       <main>
-        <form>
-          <input type="text" placeholder="Search" />
+        <form onSubmit={handleSearch}>
+          <input name="search" type="text" placeholder="Search" />
         </form>
 
-        <MovieList movies={movies} />
+        {!showSearch && <MovieList movies={movies} />}
+        {showSearch && <MovieList movies={results} />}
       </main>
     </div>
   );
