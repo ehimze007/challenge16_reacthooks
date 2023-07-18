@@ -2,14 +2,67 @@ import { useState } from "react";
 import "./App.css";
 import MovieList from "./components/MovieList";
 import moviesList from "./movies";
+import Forms from "./components/Forms";
+import NotFound from "./components/NotFound";
+import Home from "./components/Home";
+import { Link, Routes, Route } from "react-router-dom";
+import DescriptionTrailer from "./components/DescriptionTrailer";
 
 function App() {
   const [movies, setMovies] = useState(moviesList);
   const [results, setResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
 
+  return (
+    <>
+      <ul>
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/movie-list">Movie List</Link>
+        </li>
+        <li>
+          <Link to="/form">Forms</Link>
+        </li>
+      </ul>
+      <div className="app">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/form"
+            element={
+              <div>
+                <aside>
+                  <h1>Add a new movie</h1>
+                  <Forms handleSubmit={handleSubmit} />
+                </aside>
+              </div>
+            }
+          />
+          <Route
+            path="/movie-list"
+            element={
+              <main>
+                <form onSubmit={handleSearch}>
+                  <input name="search" type="text" placeholder="Search" />
+                </form>
+
+                {!showSearch && <MovieList movies={movies} />}
+                {showSearch && <MovieList movies={results} />}
+              </main>
+            }
+          />
+          <Route path="/movie-list/:id" element={<DescriptionTrailer />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </>
+  );
+
   function handleSubmit(e) {
     e.preventDefault();
+    console.log(movies);
 
     const form = e.target;
 
@@ -43,46 +96,6 @@ function App() {
     setResults(() => filteredMovies);
     setShowSearch(true);
   }
-
-  return (
-    <div className="app">
-      <aside>
-        <h1>Add a new movie</h1>
-        <form onSubmit={handleSubmit}>
-          <input name="title" type="text" placeholder="Movie title" required />
-          <textarea
-            name="description"
-            type="text"
-            rows={5}
-            placeholder="Movie description"
-            required
-          ></textarea>
-          <input
-            name="posterUrl"
-            type="text"
-            placeholder="Movie poster url"
-            required
-          />
-          <input
-            name="rating"
-            type="number"
-            placeholder="Movie rating"
-            required
-          />
-          <button type="submit">Add movie</button>
-        </form>
-      </aside>
-
-      <main>
-        <form onSubmit={handleSearch}>
-          <input name="search" type="text" placeholder="Search" />
-        </form>
-
-        {!showSearch && <MovieList movies={movies} />}
-        {showSearch && <MovieList movies={results} />}
-      </main>
-    </div>
-  );
 }
 
 export default App;
